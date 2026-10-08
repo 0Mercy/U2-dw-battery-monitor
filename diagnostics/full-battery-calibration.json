@@ -1,0 +1,11 @@
+{
+  "receiver_firmware": "8511",
+  "mouse_firmware": "2526",
+  "full_led_confirmed": true,
+  "measured_off_charger": true,
+  "full_voltage_raw": 414,
+  "evidence_file": "full-battery-calibration-evidence.json",
+  "quality": "provisional_single_full_charge_reference",
+  "accuracy_validated": false,
+  "publication_note": "Sanitized reference from the original development mouse; not calibration of the reader's mouse."
+}

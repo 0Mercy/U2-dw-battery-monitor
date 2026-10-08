@@ -1,0 +1,75 @@
+[
+  {
+    "name": "startup_success_and_estimate_semantics",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "manual_refresh_updates_time",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "periodic_refresh_uses_30_second_interval",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "refreshes_do_not_overlap",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "all_unknown_states_hide_previous_value",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "malformed_output_clears_state_and_recovers",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "nonzero_child_exit_is_failure",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "stderr_is_drained_without_deadlock",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "resume_gap_invalidates_display_and_requeries",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "icon_replacement_does_not_leak_GDI_handles",
+    "passed": true,
+    "measurements": {
+      "replacements": 2000,
+      "gdi_before": 15,
+      "gdi_after": 15
+    }
+  },
+  {
+    "name": "invalid_infinite_voltage_rejected",
+    "passed": true,
+    "measurements": {}
+  },
+  {
+    "name": "25_second_timeout_terminates_child_and_recovers",
+    "passed": true,
+    "measurements": {
+      "elapsed_seconds": 25.0393179
+    }
+  },
+  {
+    "name": "quit_click_stops_loop_child_and_icon",
+    "passed": true,
+    "measurements": {
+      "exit_seconds": 0.11017139999999999
+    }
+  }
+]

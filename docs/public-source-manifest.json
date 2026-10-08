@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-08",
+  "scope": "Source bytes copied unchanged; this is an export manifest, not a new test run.",
+  "sha256": {
+    "Start-U2DW.vbs": "63f60efedc1f11ff2325753818879d22a63a3d96771c7e5ae8a2bf66863e1dfe",
+    "tray/read_battery.py": "01d21725e7854de64fa340dd50830c5b3ada8fa2f68e8960952b9be876193b1e",
+    "tray/start.ps1": "1120327acb939b3e25154c3e6771ee2dff0add5158616b4aee5d668e789dd2a4",
+    "tray/TrayApp.cs": "f4e054d04868df44f95e82fc70729b0390a772390d7c8d8f17722fa07c996611",
+    "diagnostics/analyze_battery_thresholds.py": "cb48d9fecd86a0e6035a54509bff1293913e513e4835392aa70b93ea3b74d273",
+    "diagnostics/battery_percentage.py": "677a42828015ce622aa9df249a80290e3c6cf1e59677762d79e0b253e7f19271",
+    "diagnostics/device_lock.py": "3359f79a2679594b77c79eb4600624a7148667d5ba33323caf37d375ce0c1e0e",
+    "diagnostics/hid_probe.py": "0e7a66fc33454d5365d431d78e27f71e2aec2a6995fa252c5a7fbde73f3dce66",
+    "diagnostics/inspect_updater.py": "a17d89a6a6d26ce88c4569db6ef2cccb37aa12773a1f9bdac6396664d4e09ba2",
+    "diagnostics/monitor_voltage.py": "9cda8120168ce3797c2f2dc0484a6f83e5c2e2334e32a0945efc193078ac5ff2",
+    "diagnostics/pcap_summary.py": "20ca6aea65e58f4afc318dc0e5f5f9740c4cd576e1838c3994dc7d17bb75f4bc",
+    "diagnostics/query_version.py": "39f5b0e0f0d10c26ae68bb8341459c36457004f4e08734cca792f7d272b9c8fc",
+    "diagnostics/usb_capture.py": "767bf0d5bf6515f18247875467c83c5f1d0d57486e27b04d3adb9e147b418a60",
+    "diagnostics/vendor_listen.py": "21b7d9df75e27088196077a5058f591def467591ca598523412f506e59e4850d",
+    "tests/fake_reader.py": "7f7c397e0591a7377d40cb0f60807b5d0d9f56d3ea3c28de81a25bda3bfdff4a",
+    "tests/observe-tray.ps1": "d1f78f7287d910ccdd658846d3a164a299e1376c326f489025a1ecce478c5864",
+    "tests/run-tray-components.ps1": "2cb3a1bebe5ca9895d9a52306d775d53d52bc75a008f5f1ed636ee587793d384",
+    "tests/summarize_acceptance.py": "15bd90f55ac2d8ab643ed6282dd1436026bf7d8d2b6e71b1e858f37af917f475",
+    "tests/test_battery.py": "90119573c2c4a878bcd83610e0475f2220ee9284230b1c161b289cbfc58daa95",
+    "tests/TrayAcceptance.cs": "3e9f38dba41f739d0d11979c77237e3d38beca0ff17055735109097a2ca1387a"
+  }
+}

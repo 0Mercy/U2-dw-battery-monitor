@@ -1,0 +1,40 @@
+{
+  "receiver": {
+    "purpose": "firmware_version",
+    "request_hex": "08b44000000000000000000000000000",
+    "written": 16,
+    "received": 16,
+    "response_hex": "09851100c80000000000000000000000",
+    "firmware_version_hex": "8511",
+    "status": "complete"
+  },
+  "mouse_before": {
+    "purpose": "mouse_firmware_version",
+    "request_hex": "08b42500000000000000000000000000",
+    "written": 16,
+    "received": 16,
+    "response_hex": "092526c8000000000000000000000000",
+    "firmware_version_hex": "2526",
+    "status": "complete"
+  },
+  "voltage": {
+    "purpose": "voltage_candidate",
+    "request_hex": "08b41500000000000000000000000000",
+    "written": 16,
+    "received": 16,
+    "response_hex": "09019e00c80000000000000000000000",
+    "raw_value": 414,
+    "status": "complete"
+  },
+  "mouse_after": {
+    "purpose": "mouse_firmware_version",
+    "request_hex": "08b42500000000000000000000000000",
+    "written": 16,
+    "received": 16,
+    "response_hex": "092526c8000000000000000000000000",
+    "firmware_version_hex": "2526",
+    "status": "complete"
+  },
+  "publication_note": "Sanitized historical snapshot; device paths and timestamps removed. Not a current reading or independent proof of full charge.",
+  "time": null
+}

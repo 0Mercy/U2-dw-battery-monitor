@@ -1,0 +1,32 @@
+{
+  "record_sha256": "a12c96dd7b596f7b4c7a0a487d7522e28cec7f403c63ca20290bc6d47208df58",
+  "selection": "Last 30 seconds of completed record, after user confirmed removal",
+  "selected_count": 15,
+  "raw_values": [
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414,
+    414
+  ],
+  "full_voltage_raw": 414,
+  "limitation": "Receiver cache; an initial full-charge reference, not an independently measured capacity or equilibrium open-circuit voltage.",
+  "led_confirmation": {
+    "full_led_confirmed": true
+  },
+  "removal_confirmation": {
+    "removed_from_charger_confirmed": true,
+    "exact_removal_time_known": false
+  },
+  "publication_note": "Sanitized historical evidence summary. Statements, timestamps and raw record are retained privately; confirmations concern only the original development mouse."
+}

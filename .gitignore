@@ -1,0 +1,32 @@
+# Runtime, credentials and local tooling
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+*.pem
+*.key
+.vscode/
+.idea/
+*.log
+*.exe
+*.dll
+*.bin
+*.asm
+*.pcap
+*.pcapng
+*.zip
+/util/
+/fonts/
+/diagnostics/_analysis_deps/
+/diagnostics/firmware-analysis/
+/tests/current-run.txt
+# New experiment data stays local. These reviewed public fixtures are exceptions.
+/diagnostics/**/*.json
+/diagnostics/**/*.jsonl
+/diagnostics/**/*.txt
+!/diagnostics/full-battery-calibration.json
+!/diagnostics/full-battery-calibration-evidence.json
+!/diagnostics/percentage-investigation-snapshot.json
+!/diagnostics/acceptance-20261005-013837/python-final.json
+!/diagnostics/acceptance-20261005-013837/components-final/tray-components.json

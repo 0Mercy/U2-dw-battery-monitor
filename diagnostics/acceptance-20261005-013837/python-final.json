@@ -1,0 +1,7 @@
+{
+  "tests": 30,
+  "failures": [],
+  "errors": [],
+  "passed": true,
+  "scope": "Offline fixtures plus real Windows mutexes; no HID commands sent"
+}
