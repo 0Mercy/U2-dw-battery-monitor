@@ -74,7 +74,8 @@ namespace U2DWTray
                     PumpUntil(delegate { return Field("reader") == null; }, 8);
                     Require(Convert.ToInt32(State()["estimated_percentage"]) == 85, "Expected 85");
                     NotifyIcon icon = (NotifyIcon)Field("tray");
-                    Require(icon.Text.Contains("约 85%") && icon.Text.Contains("缓存年龄未知"), "Tooltip semantics");
+                    Form card = (Form)Field("flyout");
+                    Require(card.AccessibleName.Contains("约 85%") && card.AccessibleDescription.Contains("采样时间未提供"), "Hover card semantics");
                     Require(icon.Icon != null, "Icon missing");
                 });
                 Check("manual_refresh_updates_time", delegate {

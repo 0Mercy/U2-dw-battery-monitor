@@ -13,12 +13,130 @@ using System.Windows.Forms;
 
 namespace U2DWTray
 {
+    // A passive, owner-drawn card: hovering never takes keyboard focus.
+    internal sealed class BatteryFlyout : Form
+    {
+        private readonly float scale;
+        private string value = "--";
+        private string voltage = "等待数据";
+        private string queried = "正在读取";
+        private string reason = "";
+        private int? percentage;
+        private static readonly Color Ink = Color.FromArgb(26, 36, 46);
+        private static readonly Color Muted = Color.FromArgb(100, 111, 119);
+        private static readonly Color Accent = Color.FromArgb(0, 128, 112);
+
+        public BatteryFlyout()
+        {
+            FormBorderStyle = FormBorderStyle.None;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.Manual;
+            AutoScaleMode = AutoScaleMode.None;
+            BackColor = Color.FromArgb(249, 251, 250);
+            DoubleBuffered = true;
+            using (Graphics graphics = CreateGraphics()) scale = graphics.DpiX / 96f;
+            ClientSize = new Size((int)(304 * scale), (int)(222 * scale));
+        }
+
+        protected override bool ShowWithoutActivation { get { return true; } }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams parameters = base.CreateParams;
+                parameters.ExStyle |= 0x08000000 | 0x00000080; // NOACTIVATE | TOOLWINDOW
+                parameters.ClassStyle |= 0x00020000; // Drop shadow
+                return parameters;
+            }
+        }
+
+        public void UpdateReading(int? percent, string volts, string time, string explanation)
+        {
+            percentage = percent;
+            value = percent.HasValue ? percent.Value.ToString() : "--";
+            voltage = volts;
+            queried = time;
+            reason = explanation;
+            AccessibleName = "U2-DW · " + (percent.HasValue ? "约 " + value + "%" : explanation);
+            AccessibleDescription = "电压由基站保存，采样时间未提供；无法判断充电状态。";
+            Invalidate();
+        }
+
+        public void ShowNear(Point anchor)
+        {
+            Rectangle area = Screen.FromPoint(anchor).WorkingArea;
+            int gap = (int)(14 * scale);
+            int x = Math.Max(area.Left, Math.Min(anchor.X - Width / 2, area.Right - Width));
+            int y = anchor.Y - Height - gap;
+            if (y < area.Top) y = anchor.Y + gap;
+            y = Math.Max(area.Top, Math.Min(y, area.Bottom - Height));
+            Location = new Point(x, y);
+            // TopMost does not activate this NOACTIVATE window.
+            TopMost = true;
+            Show();
+        }
+
+        private static void DrawText(Graphics canvas, string text, float size, FontStyle style,
+                                     Color color, RectangleF bounds)
+        {
+            using (Font font = new Font("Segoe UI", size, style, GraphicsUnit.Pixel))
+            using (Brush brush = new SolidBrush(color))
+            using (StringFormat format = new StringFormat(StringFormat.GenericTypographic))
+            {
+                format.FormatFlags |= StringFormatFlags.NoWrap;
+                format.Trimming = StringTrimming.EllipsisCharacter;
+                canvas.DrawString(text, font, brush, bounds, format);
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs args)
+        {
+            base.OnPaint(args);
+            Graphics canvas = args.Graphics;
+            canvas.ScaleTransform(scale, scale);
+            canvas.SmoothingMode = SmoothingMode.AntiAlias;
+            canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            Color accent = percentage.HasValue && percentage.Value <= 10 ? Color.FromArgb(191, 81, 38) : Accent;
+            DrawText(canvas, "U2-DW", 15, FontStyle.Bold, Ink, new RectangleF(22, 18, 100, 23));
+            DrawText(canvas, "电量估算", 12, FontStyle.Regular, Muted, new RectangleF(224, 20, 66, 22));
+            DrawText(canvas, percentage.HasValue ? "约" : "", 14, FontStyle.Regular, Muted, new RectangleF(23, 75, 24, 25));
+            DrawText(canvas, value, 54, FontStyle.Bold, Ink, new RectangleF(49, 44, 160, 70));
+            DrawText(canvas, percentage.HasValue ? "%" : "", 22, FontStyle.Regular, Muted, new RectangleF(222, 74, 40, 30));
+            using (Pen track = new Pen(Color.FromArgb(223, 231, 227), 4))
+            using (Pen fill = new Pen(accent, 4))
+            {
+                track.StartCap = track.EndCap = fill.StartCap = fill.EndCap = LineCap.Round;
+                canvas.DrawLine(track, 24, 121, 280, 121);
+                if (percentage.HasValue && percentage.Value > 0)
+                    canvas.DrawLine(fill, 24, 121, 24 + 256 * percentage.Value / 100f, 121);
+            }
+            DrawText(canvas, percentage.HasValue ? voltage : reason, 13, FontStyle.Regular,
+                     percentage.HasValue ? Ink : Muted, new RectangleF(22, 138, 264, 22));
+            DrawText(canvas, queried, 12, FontStyle.Regular, Muted, new RectangleF(22, 160, 264, 21));
+            DrawText(canvas, "电压由基站保存，采样时间未提供", 11, FontStyle.Regular, Muted,
+                     new RectangleF(22, 193, 268, 20));
+            using (Pen border = new Pen(Color.FromArgb(218, 226, 222)))
+                canvas.DrawRectangle(border, 0, 0, 303, 221);
+        }
+    }
+
+    internal sealed class MenuColors : ProfessionalColorTable
+    {
+        public override Color ToolStripDropDownBackground { get { return Color.FromArgb(249, 251, 250); } }
+        public override Color MenuBorder { get { return Color.FromArgb(218, 226, 222); } }
+        public override Color MenuItemSelected { get { return Color.FromArgb(225, 240, 232); } }
+        public override Color MenuItemBorder { get { return Color.FromArgb(225, 240, 232); } }
+        public override Color SeparatorDark { get { return Color.FromArgb(226, 232, 228); } }
+        public override Color SeparatorLight { get { return Color.FromArgb(249, 251, 250); } }
+    }
+
     public sealed class TrayContext : ApplicationContext
     {
         [DllImport("user32.dll")]
         private static extern bool DestroyIcon(IntPtr icon);
 
         private readonly NotifyIcon tray = new NotifyIcon();
+        private readonly BatteryFlyout flyout = new BatteryFlyout();
         private readonly ContextMenuStrip menu = new ContextMenuStrip();
         private readonly ToolStripMenuItem title = new ToolStripMenuItem("U2-DW 电量估算");
         private readonly ToolStripMenuItem detail = new ToolStripMenuItem();
@@ -36,6 +154,10 @@ namespace U2DWTray
         private DateTime nextRead = DateTime.MinValue;
         private DateTime lastTick = DateTime.UtcNow;
         private bool closing;
+        private Point hoverAnchor;
+        private DateTime hoverStarted = DateTime.MinValue;
+        private bool hoverPending;
+        private readonly Font menuFont = new Font("Segoe UI", 10, FontStyle.Regular);
 
         public TrayContext(string pythonPath, string projectRoot)
             : this(pythonPath, projectRoot, Path.Combine(
@@ -51,21 +173,29 @@ namespace U2DWTray
             root = projectRoot;
             Directory.CreateDirectory(stateDirectory);
             stateFile = Path.Combine(stateDirectory, "status.json");
+            menu.Font = menuFont;
+            menu.ShowImageMargin = false;
+            menu.Padding = new Padding(6);
+            menu.Renderer = new ToolStripProfessionalRenderer(new MenuColors()) { RoundedEdges = false };
             title.Enabled = detail.Enabled = timestamp.Enabled = false;
             menu.Items.Add(title);
             menu.Items.Add(detail);
             menu.Items.Add(timestamp);
             menu.Items.Add(new ToolStripSeparator());
-            ToolStripMenuItem note = new ToolStripMenuItem("电压估算 · 缓存年龄及充电状态未知");
+            ToolStripMenuItem note = new ToolStripMenuItem("采样时间未提供 · 无法判断充电状态");
             note.Enabled = false;
             menu.Items.Add(note);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(refresh);
             ToolStripMenuItem quit = new ToolStripMenuItem("退出");
             menu.Items.Add(quit);
+            foreach (ToolStripItem item in menu.Items)
+                if (!(item is ToolStripSeparator)) item.Padding = new Padding(10, 6, 10, 6);
             refresh.Click += delegate { BeginRead(); };
             quit.Click += delegate { ExitThread(); };
             tray.DoubleClick += delegate { BeginRead(); };
+            tray.MouseMove += OnTrayMouseMove;
+            menu.Opening += delegate { HideFlyout(); };
             tray.ContextMenuStrip = menu;
             ShowUnknown("starting", "正在读取");
             tray.Visible = showIcon;
@@ -73,6 +203,34 @@ namespace U2DWTray
             timer.Tick += OnTick;
             timer.Start();
             BeginRead();
+        }
+
+        private void OnTrayMouseMove(object sender, MouseEventArgs args)
+        {
+            if (closing || menu.Visible || flyout.Visible) return;
+            Point cursor = Cursor.Position;
+            if (!hoverPending || Math.Abs(cursor.X - hoverAnchor.X) > 4 || Math.Abs(cursor.Y - hoverAnchor.Y) > 4)
+            {
+                hoverAnchor = cursor;
+                hoverStarted = DateTime.UtcNow;
+                hoverPending = true;
+            }
+        }
+
+        private void HideFlyout()
+        {
+            hoverPending = false;
+            flyout.Hide();
+        }
+
+        private void UpdateHover()
+        {
+            Point cursor = Cursor.Position;
+            bool nearIcon = Math.Abs(cursor.X - hoverAnchor.X) <= 14 && Math.Abs(cursor.Y - hoverAnchor.Y) <= 14;
+            if (menu.Visible || (!nearIcon && !flyout.Bounds.Contains(cursor))) HideFlyout();
+            else if (hoverPending && !flyout.Visible && nearIcon &&
+                     (DateTime.UtcNow - hoverStarted).TotalMilliseconds >= 450)
+                flyout.ShowNear(hoverAnchor);
         }
 
         private static string Reason(string status)
@@ -131,11 +289,13 @@ namespace U2DWTray
             if (closing) return;
             try
             {
+                UpdateHover();
                 DateTime now = DateTime.UtcNow;
                 bool resumed = (now - lastTick).TotalSeconds > 10;
                 lastTick = now;
                 if (resumed)
                 {
+                    HideFlyout();
                     StopReader();
                     ShowUnknown("resuming", "恢复后重新读取");
                     nextRead = DateTime.MinValue;
@@ -193,9 +353,11 @@ namespace U2DWTray
             title.Text = "U2-DW · " + label;
             detail.Text = "缓存电压：" + volts.ToString("F2") + " V";
             timestamp.Text = "查询时间：" + queried.ToString("HH:mm:ss");
-            tray.Text = "U2-DW " + label + " | " + volts.ToString("F2") + " V\n查询 "
-                + queried.ToString("HH:mm:ss") + " · 缓存年龄未知";
-            SetIcon(percent.ToString(), percent <= 10 ? Color.OrangeRed : Color.Turquoise);
+            // Suppress the legacy system tooltip; the passive card provides details.
+            tray.Text = "";
+            flyout.UpdateReading(percent, "基站电压  " + volts.ToString("F2") + " V",
+                                 "查询于 " + queried.ToString("HH:mm:ss") + " · 自动刷新", "");
+            SetIcon(percent.ToString(), percent <= 10 ? Color.OrangeRed : Color.FromArgb(67, 198, 167));
             SaveState(status, label, percent, volts, queried);
         }
 
@@ -204,7 +366,8 @@ namespace U2DWTray
             title.Text = "U2-DW · --";
             detail.Text = reason;
             timestamp.Text = "检查时间：" + DateTime.Now.ToString("HH:mm:ss");
-            tray.Text = "U2-DW · " + reason;
+            tray.Text = "";
+            flyout.UpdateReading(null, "", "检查于 " + DateTime.Now.ToString("HH:mm:ss"), reason);
             SetIcon("--", Color.Gray);
             SaveState(status, reason, null, null, DateTime.Now);
         }
@@ -216,18 +379,31 @@ namespace U2DWTray
             using (SolidBrush background = new SolidBrush(Color.FromArgb(28, 34, 43)))
             using (SolidBrush foreground = new SolidBrush(text == "--" ? Color.Silver : Color.White))
             using (SolidBrush bar = new SolidBrush(accent))
-            using (Font font = new Font("Segoe UI", text.Length == 3 ? 18 : 23,
-                                       FontStyle.Bold, GraphicsUnit.Pixel))
-            using (StringFormat format = new StringFormat())
+            using (GraphicsPath tile = new GraphicsPath())
+            using (GraphicsPath digits = new GraphicsPath())
+            using (StringFormat format = new StringFormat(StringFormat.GenericTypographic))
+            using (FontFamily family = new FontFamily("Segoe UI"))
             {
                 canvas.SmoothingMode = SmoothingMode.AntiAlias;
                 canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                 canvas.Clear(Color.Transparent);
-                canvas.FillRectangle(background, 0, 1, 32, 29);
-                format.Alignment = StringAlignment.Center;
-                format.LineAlignment = StringAlignment.Center;
-                canvas.DrawString(text, font, foreground, new RectangleF(-1, -1, 34, 29), format);
-                canvas.FillRectangle(bar, 3, 28, 26, 3);
+                tile.AddArc(0, 0, 10, 10, 180, 90);
+                tile.AddArc(22, 0, 10, 10, 270, 90);
+                tile.AddArc(22, 22, 10, 10, 0, 90);
+                tile.AddArc(0, 22, 10, 10, 90, 90);
+                tile.CloseFigure();
+                canvas.FillPath(background, tile);
+                // Outline the whole string once, then fit its actual bounds.
+                // Layout rectangles can wrap "70" and silently clip the second digit.
+                format.FormatFlags |= StringFormatFlags.NoWrap;
+                digits.AddString(text, family, (int)FontStyle.Bold, 32, PointF.Empty, format);
+                RectangleF bounds = digits.GetBounds();
+                float fit = Math.Min(28f / bounds.Width, 23f / bounds.Height);
+                float x = (32 - bounds.Width * fit) / 2 - bounds.X * fit;
+                float y = (28 - bounds.Height * fit) / 2 - bounds.Y * fit;
+                using (Matrix transform = new Matrix(fit, 0, 0, fit, x, y)) digits.Transform(transform);
+                canvas.FillPath(foreground, digits);
+                canvas.FillRectangle(bar, 8, 28, 16, 2);
                 IntPtr handle = bitmap.GetHicon();
                 Icon replacement;
                 try
@@ -289,6 +465,7 @@ namespace U2DWTray
         {
             closing = true;
             timer.Stop();
+            HideFlyout();
             StopReader();
             SaveState("stopped", "已退出", null, null, DateTime.Now);
             tray.Visible = false;
@@ -306,6 +483,8 @@ namespace U2DWTray
                 tray.Dispose();
                 if (old != null) old.Dispose();
                 menu.Dispose();
+                flyout.Dispose();
+                menuFont.Dispose();
             }
             base.Dispose(disposing);
         }

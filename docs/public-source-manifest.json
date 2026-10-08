@@ -1,6 +1,6 @@
 {
   "date": "2026-10-08",
-  "scope": "Source bytes copied unchanged; this is an export manifest, not a new test run.",
+  "scope": "Initial export snapshot for commit 081dc97, before later UI edits. Hashes describe original copied bytes, not the latest source or a new test run.",
   "sha256": {
     "Start-U2DW.vbs": "63f60efedc1f11ff2325753818879d22a63a3d96771c7e5ae8a2bf66863e1dfe",
     "tray/read_battery.py": "01d21725e7854de64fa340dd50830c5b3ada8fa2f68e8960952b9be876193b1e",
