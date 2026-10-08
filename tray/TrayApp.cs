@@ -155,8 +155,6 @@ namespace U2DWTray
         private DateTime lastTick = DateTime.UtcNow;
         private bool closing;
         private Point hoverAnchor;
-        private DateTime hoverStarted = DateTime.MinValue;
-        private bool hoverPending;
         private readonly Font menuFont = new Font("Segoe UI", 10, FontStyle.Regular);
 
         public TrayContext(string pythonPath, string projectRoot)
@@ -208,29 +206,21 @@ namespace U2DWTray
         private void OnTrayMouseMove(object sender, MouseEventArgs args)
         {
             if (closing || menu.Visible || flyout.Visible) return;
-            Point cursor = Cursor.Position;
-            if (!hoverPending || Math.Abs(cursor.X - hoverAnchor.X) > 4 || Math.Abs(cursor.Y - hoverAnchor.Y) > 4)
-            {
-                hoverAnchor = cursor;
-                hoverStarted = DateTime.UtcNow;
-                hoverPending = true;
-            }
+            hoverAnchor = Cursor.Position;
+            flyout.ShowNear(hoverAnchor);
         }
 
         private void HideFlyout()
         {
-            hoverPending = false;
             flyout.Hide();
         }
 
         private void UpdateHover()
         {
+            if (!flyout.Visible) return;
             Point cursor = Cursor.Position;
             bool nearIcon = Math.Abs(cursor.X - hoverAnchor.X) <= 14 && Math.Abs(cursor.Y - hoverAnchor.Y) <= 14;
             if (menu.Visible || (!nearIcon && !flyout.Bounds.Contains(cursor))) HideFlyout();
-            else if (hoverPending && !flyout.Visible && nearIcon &&
-                     (DateTime.UtcNow - hoverStarted).TotalMilliseconds >= 450)
-                flyout.ShowNear(hoverAnchor);
         }
 
         private static string Reason(string status)
